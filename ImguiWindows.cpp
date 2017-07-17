@@ -21,13 +21,13 @@ void drawIGSLogo(
     }
 }
 
-void aboutWindow(
-    bool& visible,
+bool aboutWindow(
     const char* title,
     const char* text,
     const ImVec2& size,
     double time )
 {
+    bool close_it = false;
     SetNextWindowSize( size );
     Begin( title );
         SetCursorPosX( GetCursorPosX() + 120 );
@@ -37,7 +37,7 @@ void aboutWindow(
         Text(" "); SameLine( GetWindowWidth() - 60 );
 
         if( Button("Close") )
-            visible = false;
+           close_it = true;
         
         ImVec2 pos = GetWindowPos();
         pos.x += 55;
@@ -45,4 +45,6 @@ void aboutWindow(
 
         drawIGSLogo( pos, time );
     End();
+
+    return close_it;    
 }
