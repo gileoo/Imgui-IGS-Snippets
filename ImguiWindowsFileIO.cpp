@@ -7,9 +7,10 @@
 
 #include <iostream>
 
-#if defined(_WINDOWS)
+#if defined(WIN32)
     #include <windows.h>
     #include <direct.h>
+    #include <tchar.h>  
     #define GetCurrentDir _getcwd
 #else
     #include <unistd.h>
@@ -27,6 +28,31 @@
 using namespace std;
 using namespace ImGui;
  
+#if defined(WIN32)
+vector<string> getWindowsDrives()
+{
+    vector<string> result;
+    TCHAR g_szDrvMsg[] = _T("A:");
+
+    ULONG uDriveMask = _getdrives();  
+  
+    if (uDriveMask == 0)  
+    {}  
+    else  
+    {  
+        while (uDriveMask) 
+        {  
+            if (uDriveMask & 1)  
+                result.push_back( g_szDrvMsg );
+  
+            ++g_szDrvMsg[0];  
+            uDriveMask >>= 1;  
+        }  
+   }  
+
+    return result;
+}
+#endif 
 
 vector<string> stringSplit(const string &s, char delim)
 {
@@ -262,6 +288,7 @@ bool fileIOWindow(
     static int  file_type_selected = 0;
     static int  file_selected = 0;
     static int  directory_selected = 0;
+    static int  drive_selected = 0;
     static bool directory_browsing = false;
     static int  recent_selected = 0;
 
@@ -331,7 +358,22 @@ bool fileIOWindow(
     if( CollapsingHeader("Browse Directories") )
     {
         directory_browsing = true;
+
+#if defined(WIN32)
+        vector<const char*> drive_list;
+        for( const string& s : getWindowsDrives() )
+            drive_list.push_back( s.c_str() );
+        
+        Text( "  " ); SameLine();
+        PushItemWidth( 40 );
+        if( ListBox( "  ", &drive_selected, drive_list.data(), drive_list.size() ) )
+        {
+            string new_path = drive_list[drive_selected];
+            strcpy( current_folder, new_path.c_str() );
+        }
+#else
         Text( "           " );
+#endif
         SameLine();
 
         PushItemWidth( GetWindowWidth()/2 - 60 );
