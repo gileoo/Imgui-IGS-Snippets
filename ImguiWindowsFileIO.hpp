@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <imgui.h>
-#include "../ImGuiGf/IconsFontAwesome.h" // <- note required. just comment if not there
+#include "../ImGuiGf/IconsFontAwesome.h" // <- note required. just comment if not available
 
 
 /** Helper class to deal with file paths.
@@ -49,6 +49,6 @@ public:
 */
 bool fileIOWindow(
     std::string& file_path,
-	std::vector<std::string>& recently_used_files,
+    std::vector<std::string>& recently_used_files,
     const std::string& button_text,
     ImVec2 size = ImVec2(420,240) );
