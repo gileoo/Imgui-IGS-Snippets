@@ -1,4 +1,4 @@
-#include "ImguiWindows.hpp"
+#include "ImguiWindowsAboutIGS.hpp"
 
 using namespace ImGui;
 
