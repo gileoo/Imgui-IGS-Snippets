@@ -17,9 +17,9 @@
 #define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
 #if defined(ICON_FA_CARET_DOWN)
-#define CARET_DOWN ICON_FA_CARET_DOWN
+    #define CARET_DOWN ICON_FA_CARET_DOWN
 #else
-#define CARET_DOWN "v"
+    #define CARET_DOWN "v"
 #endif
 
 using namespace std;
@@ -33,13 +33,13 @@ string item;
 
 // use stdlib to tokenize the string
 stringstream ss(s);
-	while (getline(ss, item, delim))
-		if(!item.empty())
-		{
-			elems.push_back(item);
-		}
+    while (getline(ss, item, delim))
+        if(!item.empty())
+        {
+            elems.push_back(item);
+        }
 
-	return elems;
+    return elems;
 }
 
 string MiniPath::filePath() const
@@ -59,49 +59,49 @@ MiniPath::MiniPath()
 
 MiniPath::MiniPath( const string& some_path )
 {
-	string s = some_path;
-	if (MiniPath::isAbsoluteFilePath (s))
-	{
-		if (s.find ("/") != string::npos) // linux style
-			fromString (s ,'/');
-		else if (s.find ("\\") != string::npos) // windows style
-			fromString (s ,'\\');
-	}
-	else
-	{
-		string current = MiniPath::getCurrentDir();
+    string s = some_path;
+    if (MiniPath::isAbsoluteFilePath (s))
+    {
+        if (s.find ("/") != string::npos) // linux style
+            fromString (s ,'/');
+        else if (s.find ("\\") != string::npos) // windows style
+            fromString (s ,'\\');
+    }
+    else
+    {
+        string current = MiniPath::getCurrentDir();
 
-		if (current.find ("/") != string::npos)
-		{
-			std::replace( s.begin(), s.end(), '\\', '/');
-			fromString (current + "/" + s ,'/');
-		}
-		else if (current.find ("\\") != string::npos)
-		{
-			std::replace( s.begin(), s.end(), '/', '\\');
-			fromString (current + "\\" + s ,'\\');
-		}
-		else
-			fromNameInCurrentDir( s );
-	}
+        if (current.find ("/") != string::npos)
+        {
+            std::replace( s.begin(), s.end(), '\\', '/');
+            fromString (current + "/" + s ,'/');
+        }
+        else if (current.find ("\\") != string::npos)
+        {
+            std::replace( s.begin(), s.end(), '/', '\\');
+            fromString (current + "\\" + s ,'\\');
+        }
+        else
+            fromNameInCurrentDir( s );
+    }
 }
 
 string MiniPath::getDelim() const
 {
-	if (path.find ("/") != string::npos) // linux style
-			return "/";
-	else if (path.find ("\\") != string::npos) // windows style
-			return "\\";
-	else
-	{
-		string current = MiniPath::getCurrentDir();
-		if (current.find ("/") != string::npos) // linux style
-			return "/";
-		else if (current.find ("\\") != string::npos) // windows style
-			return "\\";
-		else
-			return "/";
-	}
+    if (path.find ("/") != string::npos) // linux style
+            return "/";
+    else if (path.find ("\\") != string::npos) // windows style
+            return "\\";
+    else
+    {
+        string current = MiniPath::getCurrentDir();
+        if (current.find ("/") != string::npos) // linux style
+            return "/";
+        else if (current.find ("\\") != string::npos) // windows style
+            return "\\";
+        else
+            return "/";
+    }
 }
 
 string MiniPath::prefix() const
@@ -111,8 +111,8 @@ string MiniPath::prefix() const
 
 string MiniPath::extension() const
 {
-	if (name.find (".") == string::npos)
-		return "";
+    if (name.find (".") == string::npos)
+        return "";
 
     return name.substr (name.find_last_of ('.')+1);
 }
@@ -236,7 +236,7 @@ std::list<string> MiniPath::listFiles( const string& s, string filter )
 
 bool fileIOWindow(
     string& file_path,
-	std::vector<string>& recently_used_files,
+    std::vector<string>& recently_used_files,
     const string& button_text,
     ImVec2 size )
 {
