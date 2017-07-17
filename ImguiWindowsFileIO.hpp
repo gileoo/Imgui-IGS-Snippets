@@ -36,7 +36,9 @@ public:
     bool setPath( const std::string& absolut_path );
     std::string getDelim() const;
     
+
     static std::string getCurrentDir();
+    static std::string getSystemDelim();
     static bool isAbsoluteFilePath( const std::string& s );
 	static std::string combine( const std::string& s1, const std::string& s2 );
 	static std::list<std::string> listDirectories( const std::string& s );

@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <sstream>
 
+#include <iostream>
+
 #if defined(_WINDOWS)
     #include <windows.h>
     #include <direct.h>
@@ -94,6 +96,12 @@ string MiniPath::getDelim() const
             return "\\";
     else
     {
+        return MiniPath::getSystemDelim();
+    }
+}
+
+std::string MiniPath::getSystemDelim()
+{
         string current = MiniPath::getCurrentDir();
         if (current.find ("/") != string::npos) // linux style
             return "/";
@@ -101,7 +109,6 @@ string MiniPath::getDelim() const
             return "\\";
         else
             return "/";
-    }
 }
 
 string MiniPath::prefix() const
@@ -197,7 +204,9 @@ std::list<string> MiniPath::listDirectories( const string& s )
     struct _finddata_t c_file;
     intptr_t hFile;
 
-    if( (hFile = _findfirst( "*.*", &c_file )) == -1L )
+    string filter = s + MiniPath::getSystemDelim() + "*.*";
+
+    if( (hFile = _findfirst( filter.c_str(), &c_file )) == -1L )
     {}
     else
     {
@@ -219,7 +228,9 @@ std::list<string> MiniPath::listFiles( const string& s, string filter )
     struct _finddata_t c_file;
     intptr_t hFile;
 
-    if( (hFile = _findfirst( filter.c_str(), &c_file )) == -1L )
+    string find_filter = s + MiniPath::getSystemDelim() + filter;
+
+    if( (hFile = _findfirst( find_filter.c_str(), &c_file )) == -1L )
     {}
     else
     {
@@ -254,15 +265,17 @@ bool fileIOWindow(
     static bool directory_browsing = false;
     static int  recent_selected = 0;
 
-    string tmp = string( current_folder );
+    string sys_delim = MiniPath::getSystemDelim();
+
+    string tmp = string( current_folder ) + sys_delim;
     MiniPath current_mini_path( tmp );
 
-    list<string> directories = MiniPath::listDirectories( file_path );
+    list<string> directories = MiniPath::listDirectories( current_mini_path.getPath() );
     std::vector<const char*> dir_list;
     for( const string& s : directories )
         dir_list.push_back( s.c_str() );
     
-    list<string> local_files = MiniPath::listFiles( file_path, string( extension_cstrings[file_type_selected] ) );
+    list<string> local_files = MiniPath::listFiles( current_mini_path.getPath(), string( extension_cstrings[file_type_selected] ) );
     std::vector<const char*> file_list; 
     for( const string& s : local_files )
         file_list.push_back( s.c_str() );
@@ -295,12 +308,22 @@ bool fileIOWindow(
         }
         ImGui::EndPopup();
     }
-    Text("           "); SameLine();
 
+    Text("           "); SameLine();
     vector<string> split_directories = current_mini_path.getPathTokens();
     for( int i = 0; i < split_directories.size(); ++i )
     {
-        Button( split_directories[i].c_str() ); 
+        if( Button( split_directories[i].c_str() ) )
+        {
+            string chosen_dir;
+            for( int j ; j <= i; ++j)
+            {
+                chosen_dir += split_directories[j];
+                if( j != i )
+                    chosen_dir += sys_delim;
+            }
+            strcpy( current_folder, chosen_dir.c_str() );
+        } 
         if( i != split_directories.size()-1 )
             SameLine();
     }
