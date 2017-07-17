@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <imgui.h>
-#include "../ImGuiGf/IconsFontAwesome.h"
+#include "../ImGuiGf/IconsFontAwesome.h" // <- note required. just comment if not there
 
 
 /** Helper class to deal with file paths.
