@@ -337,7 +337,8 @@ bool fileIOWindow(
         PushItemWidth( GetWindowWidth()/2 - 60 );
         if( ListBox( " ", &directory_selected, dir_list.data(), dir_list.size() ) )
         {
-            strcpy( current_folder, dir_list[directory_selected] );
+            string new_path = string( current_folder ) + sys_delim + dir_list[directory_selected];
+            strcpy( current_folder, new_path.c_str() );
         }
 
         SameLine();
