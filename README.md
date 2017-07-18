@@ -28,8 +28,8 @@ if( window_fileIO_visible )
     }
 }  
   ```
-    * snippet example - open:
-	```c++
+  * snippet example - open:
+  ```c++
 if( window_fileIO_visible )
 {
     string open_file;
@@ -43,7 +43,7 @@ if( window_fileIO_visible )
         }
     }
 }	
-	```
+  ```
   
 
 ## About Dialoge
