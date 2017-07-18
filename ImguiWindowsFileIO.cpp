@@ -367,8 +367,10 @@ bool fileIOWindow(
     {
         if( ListBox( "", &recent_selected, recent.data(), recent.size() ) )
         {
-            strcpy(current_file, recent[recent_selected]);
-            file_path = current_file;
+            current_mini_path.fromString( string( recent[recent_selected] ), sys_delim[0] );
+            if( !current_mini_path.getName().empty() ) 
+                strcpy( current_file, current_mini_path.getName().c_str() );
+            current_folder = current_mini_path.getPath();
             CloseCurrentPopup();
         }
         ImGui::EndPopup();
