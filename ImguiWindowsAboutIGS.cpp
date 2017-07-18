@@ -1,5 +1,7 @@
 #include "ImguiWindowsAboutIGS.hpp"
 
+#include <cmath>
+
 using namespace ImGui;
 
 void drawIGSLogo( 
