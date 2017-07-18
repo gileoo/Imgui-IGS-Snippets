@@ -7,7 +7,6 @@ Imgui code exchanges for convenience at IGS
  * additional subdirectory buttons (linux style)
  
  ![Imgui FileIO Dialogue](images/Imgui-File-Open.PNG)
- 
   * snippet example - save:
   ```c++
 if( window_fileIO_visible )
@@ -28,6 +27,7 @@ if( window_fileIO_visible )
     }
 }  
   ```
+  ![Imgui FileIO Dialogue Default](images/Imgui-File-Save.PNG)
   * snippet example - open:
   ```c++
 if( window_fileIO_visible )
