@@ -56,7 +56,7 @@ if( window_fileIO_visible )
  * snippet example:
   ```c++
 if( about_window_visible &&  
-    aboutWindow( 
+      aboutWindow( 
 		ICON_FA_INFO_CIRCLE " About",
 		"My fancy tools\n"
 		"Abla bli blub ....\n",
