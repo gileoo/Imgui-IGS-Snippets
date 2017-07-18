@@ -8,8 +8,7 @@ Imgui code exchanges for convenience at IGS
  
  ![Imgui FileIO Dialogue](images/Imgui-File-Open.PNG)
  
-  * example - save:
-    inside the render loop somewhere do:
+  * snippet example - save:
   ```c++
 if( window_fileIO_visible )
 {
@@ -29,7 +28,22 @@ if( window_fileIO_visible )
     }
 }  
   ```
-  
+    * snippet example - open:
+	```c++
+if( window_fileIO_visible )
+{
+    string open_file;
+    if( fileIOWindow( open_file, window_recent_files, "Open", {"*.usr", "*.*"}, true  ) )
+    {
+        window_fileIO_visible = false;
+        if( !open_file.empty() )
+        {
+            window_recent_files.push_back( open_file );
+            readStuffFromFile( open_file );
+        }
+    }
+}	
+	```
   
 
 ## About Dialoge
@@ -38,3 +52,15 @@ if( window_fileIO_visible )
  * animated IGS logo
  
  ![Imgui About Dialogue](images/Imgui-About-IGS.PNG)
+ 
+ * snippet example:
+  ```c++
+if( about_window_visible &&  
+    aboutWindow( 
+		ICON_FA_INFO_CIRCLE " About",
+		"My fancy tools\n"
+		"Abla bli blub ....\n",
+		ImVec2( 400, 155 ),
+		time ) )
+		about_window_visible = false;
+  ```
