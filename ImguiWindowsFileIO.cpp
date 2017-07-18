@@ -1,11 +1,8 @@
-
 #include "ImguiWindowsFileIO.hpp"
 
 #include <algorithm>
 #include <cstdlib>
 #include <sstream>
-
-#include <iostream>
 
 #if defined(WIN32)
     #include <windows.h>
@@ -383,7 +380,7 @@ bool fileIOWindow(
         if( Button( split_directories[i].c_str() ) )
         {
             string chosen_dir;
-            for( int j ; j <= i; ++j)
+            for( int j = 0; j <= i; ++j)
             {
                 chosen_dir += split_directories[j];
                 if( j != i )
