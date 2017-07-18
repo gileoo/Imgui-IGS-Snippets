@@ -398,7 +398,13 @@ bool fileIOWindow(
 
 #if defined(WIN32)
         vector<const char*> drive_list = toCStringVec( getWindowsDrives() );
-        
+
+        // select list item dependent on folder path
+        if( drive_list[drive_selected][0] != c_current_folder[0]  )
+            for( int i = 0; i < drive_list.size(); ++i )
+               if( c_current_folder[0] == drive_list[i][0] )
+                    drive_selected = i;
+
         Text( "  " ); SameLine();
         PushItemWidth( 40 );
         if( ListBox( "  ", &drive_selected, drive_list.data(), drive_list.size() ) )
