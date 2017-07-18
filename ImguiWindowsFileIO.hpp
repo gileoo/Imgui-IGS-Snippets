@@ -47,6 +47,39 @@ public:
 };
 
 /** Show a file-io dialoge window, e.g. usable as file save and file close dialoge.
+Example - Save:
+if( window_fileIO_visible )
+{
+    string save_file;
+    if( fileIOWindow( save_file, window_recent_files, "Save", {"*.usr", "*.*"} ) )
+    {
+        window_fileIO_visible = false;
+        if( !save_file.empty() )
+        {
+            window_recent_files.push_back( save_file );
+ 
+            ofstream out_file;
+            out_file.open( save_file, ios_base::trunc );          
+            writeStuffToFile( out_file ); 
+            out_file.close();
+        }
+    }
+}
+
+Example - Open:
+if( window_fileIO_visible )
+{
+    string open_file;
+    if( fileIOWindow( open_file, window_recent_files, "Open", {"*.usr", "*.*"}, true  ) )
+    {
+        window_fileIO_visible = false;
+        if( !open_file.empty() )
+        {
+            window_recent_files.push_back( open_file );
+            readStuffFromFile( open_file );
+        }
+    }
+}
 */
 bool fileIOWindow(
     std::string& file_path,
