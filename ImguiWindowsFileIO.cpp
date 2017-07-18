@@ -282,6 +282,22 @@ bool MiniPath::pathExists( const std::string& s )
     return false;
 }
 
+vector<const char*> toCStringVec( const vector<string>& vs )
+{
+    std::vector<const char*> tmp;
+    for( const string& s : vs )
+        tmp.push_back( s.c_str() );
+    return tmp;
+}
+
+vector<const char*> toCStringVec( const list<string>& vs )
+{
+    std::vector<const char*> tmp;
+    for( const string& s : vs )
+        tmp.push_back( s.c_str() );
+    return tmp;
+}
+
 bool fileIOWindow(
     string& file_path,
     std::vector<string>& recently_used_files,
@@ -292,9 +308,7 @@ bool fileIOWindow(
 {
     bool close_it = false;
 
-    std::vector<const char*> extension_cstrings;
-    for( const string& s : file_filter )
-        extension_cstrings.push_back( s.c_str() );
+    vector<const char*> extension_cstrings = toCStringVec( file_filter );
     
     static string current_folder = "x";
     static char c_current_folder[ 2048 ];
@@ -312,22 +326,19 @@ bool fileIOWindow(
 
     string sys_delim = MiniPath::getSystemDelim();
 
-    string tmp = current_folder + sys_delim;
+    string tmp = current_folder + sys_delim + current_file;
     MiniPath current_mini_path( tmp );
 
     list<string> directories = MiniPath::listDirectories( current_mini_path.getPath() );
     std::vector<const char*> dir_list;
     for( const string& s : directories )
     {
-        if( s == "." )
-            continue;
+        if( s == "." ) continue;
         dir_list.push_back( s.c_str() );
     }
     
     list<string> local_files = MiniPath::listFiles( current_mini_path.getPath(), string( extension_cstrings[file_type_selected] ) );
-    std::vector<const char*> file_list; 
-    for( const string& s : local_files )
-        file_list.push_back( s.c_str() );
+    vector<const char*> file_list = toCStringVec( local_files ); 
 
     if ( directory_browsing ) 
         size.y += std::min( size_t( 8 ), std::max( dir_list.size(), file_list.size() ) ) *  GetFontSize();
@@ -347,9 +358,7 @@ bool fileIOWindow(
     }
     SameLine();
 
-    std::vector<const char*> recent {};
-    for( const auto& string : recently_used_files )
-        recent.push_back(string.c_str());
+    std::vector<const char*> recent = toCStringVec( recently_used_files );
 
     if( Button(" " CARET_DOWN " ") )
         ImGui::OpenPopup("RecentFiles");
@@ -389,9 +398,7 @@ bool fileIOWindow(
         directory_browsing = true;
 
 #if defined(WIN32)
-        vector<const char*> drive_list;
-        for( const string& s : getWindowsDrives() )
-            drive_list.push_back( s.c_str() );
+        vector<const char*> drive_list = toCStringVec( getWindowsDrives() );
         
         Text( "  " ); SameLine();
         PushItemWidth( 40 );
@@ -461,7 +468,16 @@ bool fileIOWindow(
     SetCursorPos( pos );
     if( Button( button_text.c_str() ) )
     {
-        file_path = current_folder + sys_delim + current_file;
+        vector<string> ext_filter_v = stringSplit( extension_cstrings[file_type_selected], '.');
+        if( ext_filter_v.size() == 2 && 
+            ext_filter_v[1] != "*" )
+        {
+            string ext_filter = ext_filter_v[1];
+            if( current_mini_path.extension() == ext_filter )
+                file_path = current_mini_path.filePath();
+        }
+        else
+            file_path = current_mini_path.filePath();
 
         if( ensure_file_exists ) 
         {
