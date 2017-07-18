@@ -52,5 +52,6 @@ bool fileIOWindow(
     std::string& file_path,
     std::vector<std::string>& recently_used_files,
     const std::string& button_text,
+    std::vector<std::string> file_filter = {"*.*"}, 
     bool ensure_file_exists = false,
     ImVec2 size = ImVec2(420,240) );

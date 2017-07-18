@@ -286,12 +286,15 @@ bool fileIOWindow(
     string& file_path,
     std::vector<string>& recently_used_files,
     const string& button_text,
+    std::vector<std::string> file_filter,
     bool ensure_file_exists,
     ImVec2 size )
 {
     bool close_it = false;
 
-    std::vector<const char*> extension_cstrings { "*.usr", "*.*" };
+    std::vector<const char*> extension_cstrings;
+    for( const string& s : file_filter )
+        extension_cstrings.push_back( s.c_str() );
     
     static string current_folder = "x";
     static char c_current_folder[ 2048 ];
