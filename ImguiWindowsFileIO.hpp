@@ -18,10 +18,10 @@ private:
     std::string name {""};
 
 public:
-	MiniPath( const std::string& some_path );
-	MiniPath();
+    MiniPath( const std::string& some_path );
+    MiniPath();
 
-	void fromString (const std::string& file_path, char delim);
+    void fromString (const std::string& file_path, char delim);
     void fromNameInCurrentDir( const std::string& file_name );
 
     std::string filePath() const;
@@ -40,9 +40,9 @@ public:
     static std::string getCurrentDir();
     static std::string getSystemDelim();
     static bool isAbsoluteFilePath( const std::string& s );
-	static std::string combine( const std::string& s1, const std::string& s2 );
-	static std::list<std::string> listDirectories( const std::string& s );
-	static std::list<std::string> listFiles( const std::string& s, std::string filter = "*.*" );	
+    static std::string combine( const std::string& s1, const std::string& s2 );
+    static std::list<std::string> listDirectories( const std::string& s );
+    static std::list<std::string> listFiles( const std::string& s, std::string filter = "*.*" );	
     static bool pathExists( const std::string& s );
 };
 
