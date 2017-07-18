@@ -271,19 +271,34 @@ std::list<string> MiniPath::listFiles( const string& s, string filter )
     return files;
 }
 
+bool MiniPath::pathExists( const std::string& s )
+{
+    struct _finddata_t c_file;
+    intptr_t hFile; 
+
+    if( (hFile = _findfirst( s.c_str(), &c_file )) != -1L )
+        return true;
+
+    return false;
+}
+
 bool fileIOWindow(
     string& file_path,
     std::vector<string>& recently_used_files,
     const string& button_text,
+    bool ensure_file_exists,
     ImVec2 size )
 {
     bool close_it = false;
 
     std::vector<const char*> extension_cstrings { "*.usr", "*.*" };
+    
+    static string current_folder = "x";
+    static char c_current_folder[ 2048 ];
 
-    static char current_folder[ 2048 ] = "x";
-    if( strcmp( current_folder, "x" ) == 0 )
-        strcpy( current_folder, MiniPath::getCurrentDir().c_str() );
+    if( current_folder == "x" )
+        current_folder = MiniPath::getCurrentDir();
+
     static char current_file[ 256 ] = "Test.usr";
     static int  file_type_selected = 0;
     static int  file_selected = 0;
@@ -294,13 +309,17 @@ bool fileIOWindow(
 
     string sys_delim = MiniPath::getSystemDelim();
 
-    string tmp = string( current_folder ) + sys_delim;
+    string tmp = current_folder + sys_delim;
     MiniPath current_mini_path( tmp );
 
     list<string> directories = MiniPath::listDirectories( current_mini_path.getPath() );
     std::vector<const char*> dir_list;
     for( const string& s : directories )
+    {
+        if( s == "." )
+            continue;
         dir_list.push_back( s.c_str() );
+    }
     
     list<string> local_files = MiniPath::listFiles( current_mini_path.getPath(), string( extension_cstrings[file_type_selected] ) );
     std::vector<const char*> file_list; 
@@ -316,7 +335,14 @@ bool fileIOWindow(
     Text("Directory: "); SameLine();
     PushItemWidth( GetWindowWidth() - 145 ); 
 
-    InputText( " ", current_folder, IM_ARRAYSIZE( current_folder ) ); SameLine();
+    strcpy( c_current_folder, current_folder.c_str() ); 
+    if( InputText( " ", c_current_folder, IM_ARRAYSIZE( c_current_folder ) ) )
+    {
+        string tmp = c_current_folder;
+        if( MiniPath::pathExists( tmp ) )
+            current_folder = c_current_folder;
+    }
+    SameLine();
 
     std::vector<const char*> recent {};
     for( const auto& string : recently_used_files )
@@ -349,7 +375,7 @@ bool fileIOWindow(
                 if( j != i )
                     chosen_dir += sys_delim;
             }
-            strcpy( current_folder, chosen_dir.c_str() );
+            current_folder = chosen_dir;
         } 
         if( i != split_directories.size()-1 )
             SameLine();
@@ -369,7 +395,7 @@ bool fileIOWindow(
         if( ListBox( "  ", &drive_selected, drive_list.data(), drive_list.size() ) )
         {
             string new_path = drive_list[drive_selected];
-            strcpy( current_folder, new_path.c_str() );
+            current_folder = new_path;
         }
 #else
         Text( "           " );
@@ -379,8 +405,21 @@ bool fileIOWindow(
         PushItemWidth( GetWindowWidth()/2 - 60 );
         if( ListBox( " ", &directory_selected, dir_list.data(), dir_list.size() ) )
         {
-            string new_path = string( current_folder ) + sys_delim + dir_list[directory_selected];
-            strcpy( current_folder, new_path.c_str() );
+            string new_path;
+
+            if( string(dir_list[directory_selected]).find( ".." ) != std::string::npos )
+            {
+                vector<string> split_directories = current_mini_path.getPathTokens();
+                current_folder.clear();
+                for( int i = 0; i < split_directories.size() - 1; ++i )
+                {
+                    current_folder += split_directories[i];
+                    if( i < split_directories.size() - 2 )
+                        current_folder += sys_delim;
+                }
+            }
+            else
+                current_folder = current_folder + sys_delim + dir_list[directory_selected];
         }
 
         SameLine();
@@ -419,8 +458,15 @@ bool fileIOWindow(
     SetCursorPos( pos );
     if( Button( button_text.c_str() ) )
     {
-        file_path = current_file;
-        close_it = true;
+        file_path = current_folder + sys_delim + current_file;
+
+        if( ensure_file_exists ) 
+        {
+            if( MiniPath::pathExists( file_path ) ) 
+                close_it = true;
+        }
+        else
+            close_it = true;
     }
 
     SameLine();
