@@ -1,4 +1,4 @@
-#include "ImguiWindowsFileIO.h"
+#include "ImguiWindowsFileIO.hpp"
 
 #include <algorithm>
 #include <cstdlib>
@@ -353,19 +353,37 @@ bool MiniPath::pathExists( const std::string& s )
 #endif
 }
 
-vector<const char*> toCStringVec( const vector<string>& vs )
+
+vector<const char*> toCStringVec( const vector<string>& vs, int readable_length = 0 )
 {
     std::vector<const char*> tmp;
     for( const string& s : vs )
-        tmp.push_back( s.c_str() );
+        if( readable_length < 5 )
+            tmp.push_back( s.c_str() );
+        else    
+        {
+            string tmp2 = s.substr( 0, readable_length / 2 - 1 );
+            tmp2 += "...";
+            tmp2 += s.substr( s.size() - readable_length / 2 + 1, s.size()-1 );
+            tmp.push_back( tmp2.c_str() ); 
+        }
     return tmp;
 }
 
-vector<const char*> toCStringVec( const list<string>& vs )
+
+vector<const char*> toCStringVec( const list<string>& vs, int readable_length = 0 )
 {
     std::vector<const char*> tmp;
     for( const string& s : vs )
-        tmp.push_back( s.c_str() );
+        if( readable_length < 5 )
+            tmp.push_back( s.c_str() );
+        else    
+        {
+            string tmp2 = s.substr( 0, readable_length / 2 - 1 );
+            tmp2 += "...";
+            tmp2 += s.substr( s.size() - readable_length / 2 + 1, s.size()-1 );
+            tmp.push_back( tmp2.c_str() ); 
+        }
     return tmp;
 }
 
@@ -429,24 +447,26 @@ bool fileIOWindow(
     }
     SameLine();
 
-    std::vector<const char*> recent = toCStringVec( recently_used_files );
-
-    if( Button(" " CARET_DOWN " ") )
-        ImGui::OpenPopup("RecentFiles");
-
-    if (ImGui::BeginPopup("RecentFiles"))
+    if( !recently_used_files.empty() )
     {
-        if( ListBox( "", &recent_selected, recent.data(), recent.size() ) )
-        {
-            current_mini_path.fromString( string( recent[recent_selected] ), sys_delim[0] );
-            if( !current_mini_path.getName().empty() )
-                strcpy( current_file, current_mini_path.getName().c_str() );
-            current_folder = current_mini_path.getPath();
-            CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
-    }
+        std::vector<const char*> recent = toCStringVec( recently_used_files, 27 );
 
+        if( Button(" " CARET_DOWN " ") )
+            ImGui::OpenPopup("RecentFiles");
+
+        if (ImGui::BeginPopup("RecentFiles"))
+        {
+            if( ListBox( "", &recent_selected, recent.data(), recent.size() ) )
+            {
+                current_mini_path.fromString( recently_used_files[recent_selected], sys_delim[0] );
+                if( !current_mini_path.getName().empty() )
+                    strcpy( current_file, current_mini_path.getName().c_str() );
+                current_folder = current_mini_path.getPath();
+                CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+    }
     Text("           "); SameLine();
     vector<string> split_directories = current_mini_path.getPathTokens();
     for( int i = 0; i < split_directories.size(); ++i )
