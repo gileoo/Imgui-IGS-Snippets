@@ -3,6 +3,7 @@ Imgui code exchanges for convenience at IGS
 
 ## Tested on
  * windows, mingw gcc 5.1.0 - cmake/ninja, imgui 1.49
+ * ubuntu, gcc 5.4 - cmake/ninja, imgui 1.50
 
 ## FileIO Dialogue
  * similar to the standard windows file-io
