@@ -445,10 +445,11 @@ bool fileIOWindow(
         if( MiniPath::pathExists( tmp ) )
             current_folder = c_current_folder;
     }
-    SameLine();
 
     if( !recently_used_files.empty() )
     {
+    	SameLine();
+
         std::vector<const char*> recent = toCStringVec( recently_used_files, 27 );
 
         if( Button(" " CARET_DOWN " ") )
