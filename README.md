@@ -75,7 +75,9 @@ if( about_window_visible &&
  * Overall Time
  * Framecounter
  * Frames per Second (current, min, avg, max)
- * Timestep (current, min, avg, max)
+ * Frametime (current, min, avg, max)
+ * Frames per Second Plot over time
+ * Frametime histogram
 
  ![Imgui Frameclock Statistic Dialogue](images/Imgui-Frame-Clock.PNG)
 
