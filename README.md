@@ -68,3 +68,24 @@ if( about_window_visible &&
 		time ) )
 		about_window_visible = false;
   ```
+
+
+
+## Frameclock Statistic Dialogue
+ * Overall Time
+ * Framecounter
+ * Frames per Second (current, min, avg, max)
+ * Timestep (current, min, avg, max)
+
+ ![Imgui Frameclock Statistic Dialogue](images/Imgui-Frame-Clock.PNG)
+
+ * snippet example:
+  ```c++
+static FrameClock clock;
+
+clock.beginFrame();
+
+frameClockWindow(clock);
+
+clock.endFrame();
+  ```
