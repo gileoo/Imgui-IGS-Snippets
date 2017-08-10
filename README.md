@@ -115,9 +115,9 @@ GridLayout layout(
 layout.placeNextWindow( ImVec2(0,0), ImVec2(2,2), "ltlb" );
 ImGui::Begin("Control"); /* ... */ ImGui::End();
 // meaning: 
-//   - topleft corner of window at cell 0,0 
+//   - left-top corner of window at cell 0,0 
 //     counted from left and top
-//   - bottomrigth corner of window at cell 2,2 
+//   - right-bottom corner of window at cell 2,2 
 //     counted from left and bottom
 
 
