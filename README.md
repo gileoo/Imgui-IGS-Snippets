@@ -105,15 +105,21 @@ clock.endFrame();
  * snippet example:
   ```c++
 GridLayout layout( 
-	ImVec2( window_size.x, window_size.y ), // window size in pixel
-	ImVec2( 10, 10 ),                       // grid divisions of 10 in x and y screen direction (default 10, 10)
-	20                                      // height of a menu in pixel (default (20))
-	);
+	ImVec2( window_size.x, window_size.y ), // window size in pixels
+	ImVec2( 10, 10 ),                       // grid divisions of 10 in x and y direction (default 10, 10)
+	20 );                                   // height of a menu in pixel (default (20))
 
 /* ... */
 
+// call layout function before creating the next window
 layout.placeNextWindow( ImVec2(0,0), ImVec2(2,2), "ltlb" );
 ImGui::Begin("Control"); /* ... */ ImGui::End();
+// meaning: 
+//   - topleft corner of window at cell 0,0 
+//     counted from left and top
+//   - bottomrigth corner of window at cell 2,2 
+//     counted from left and bottom
+
 
 layout.placeNextWindow( ImVec2(5,2), ImVec2(0,0), "lbrb" );
 ImGui::Begin("Error"); /* ... */ ImGui::End();
