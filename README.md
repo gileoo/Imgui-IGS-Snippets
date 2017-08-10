@@ -104,7 +104,11 @@ clock.endFrame();
  
  * snippet example:
   ```c++
-GridLayout layout( ImVec2( window_size.x, window_size.y ) );
+GridLayout layout( 
+	ImVec2( window_size.x, window_size.y ), // window size in pixel
+	ImVec2( 10, 10 ),                       // grid divisions of 10 in x and y screen direction (default 10, 10)
+	20                                      // height of a menu in pixel (default (20))
+	);
 
 /* ... */
 
