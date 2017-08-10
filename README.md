@@ -91,3 +91,35 @@ frameClockWindow(clock);
 
 clock.endFrame();
   ```
+  
+  
+## Grid Layout Helper 
+ * Setup next window size and position according to a grid layout
+ * Controlable grid divisions
+ * Setup by pair of top-left and bottom-right grid coordinates with 4-letter string encoded mode
+   * e.g. "ltlt" -> cell nr. left, top, left, top
+   * e.g. "blbr" -> cell nr. bottom, left, bottom, right
+   
+ ![Imgui Grid Layout](images/Imgui-GridLayout.PNG)
+ 
+ * snippet example:
+  ```c++
+GridLayout layout( ImVec2( window_size.x, window_size.y ) );
+
+/* ... */
+
+layout.placeNextWindow( ImVec2(0,0), ImVec2(2,2), "ltlb" );
+ImGui::Begin("Control"); /* ... */ ImGui::End();
+
+layout.placeNextWindow( ImVec2(5,2), ImVec2(0,0), "lbrb" );
+ImGui::Begin("Error"); /* ... */ ImGui::End();
+
+layout.placeNextWindow( ImVec2(2,0), ImVec2(0,2), "ltrt" );
+ImGui::Begin("MSSF-" ICON_FA_PICTURE_O ); /* ... */ ImGui::End();
+
+layout.placeNextWindow( ImVec2(3,2), ImVec2(0,2),"rtrb" );
+Begin( "MSSF-" ICON_FA_LINE_CHART  ); /* ... */ ImGui::End();
+
+layout.placeNextWindow( ImVec2(0,2), ImVec2(5,0), "lblb" );
+Begin("AutoIntegrationGraphs"); /* ... */ ImGui::End();
+  ```
