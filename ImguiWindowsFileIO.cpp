@@ -3,8 +3,11 @@
 #include <algorithm>
 #include <cstdlib>
 #include <sstream>
+#include <iostream>
 
-#if defined(WIN32)
+#include <experimental/filesystem>
+
+#if defined(_WIN32)
 #include <windows.h>
 #include <direct.h>
 #include <tchar.h>
@@ -191,13 +194,13 @@ vector<string> MiniPath::getPathTokens() const
 void MiniPath::setName( const string& name )
 {
     string tmp;
-    unsigned last_delim_pos = name.find_last_of ('/');
+    size_t last_delim_pos = name.find_last_of ('/');
     if( last_delim_pos != string::npos )
         tmp = name.substr (last_delim_pos+1);
     else
         tmp = name;
 
-    unsigned last_delim_pos2 = tmp.find_last_of ('\\');
+    size_t last_delim_pos2 = tmp.find_last_of ('\\');
     if( last_delim_pos2 != string::npos )
         tmp = tmp.substr (last_delim_pos2+1);
 
@@ -229,7 +232,9 @@ bool MiniPath::isAbsoluteFilePath( const string& s )
 
 std::list<string> MiniPath::listDirectories( const string& s )
 {
-#if defined(WIN32)
+#if defined(_WIN32)
+    using namespace experimental::filesystem;
+
     list<string> directories;
 
     struct _finddata_t c_file;
@@ -243,11 +248,11 @@ std::list<string> MiniPath::listDirectories( const string& s )
     {
         do
         {
-            char buffer[256];
             if( ( c_file.attrib & _A_SUBDIR ) )
                 directories.push_back( string( c_file.name ) );
         } while( _findnext( hFile, &c_file ) == 0 );
     }
+
 
     return directories;
 #else
@@ -278,8 +283,10 @@ std::list<string> MiniPath::listDirectories( const string& s )
 
 std::list<string> MiniPath::listFiles( const string& s, string filter )
 {
-#if defined(WIN32)
+#if defined(_WIN32)
+    using namespace experimental::filesystem;
     list<string> files;
+
 
     struct _finddata_t c_file;
     intptr_t hFile;
@@ -292,11 +299,11 @@ std::list<string> MiniPath::listFiles( const string& s, string filter )
     {
         do
         {
-            char buffer[256];
             if( !( c_file.attrib & _A_SUBDIR ) )
                 files.push_back( string( c_file.name ) );
         } while( _findnext( hFile, &c_file ) == 0 );
     }
+
 
     return files;
 #else
@@ -334,7 +341,7 @@ std::list<string> MiniPath::listFiles( const string& s, string filter )
 
 bool MiniPath::pathExists( const std::string& s )
 {
-#if defined(WIN32)
+#if defined(_WIN32)
     struct _finddata_t c_file;
     intptr_t hFile;
 
@@ -353,51 +360,76 @@ bool MiniPath::pathExists( const std::string& s )
 #endif
 }
 
-
-vector<const char*> toCStringVec( const vector<string>& vs, int readable_length = 0 )
+vector<string> toLimited( 
+    const vector<string>& vs, 
+    int readable_length = 5 )
 {
-    std::vector<const char*> tmp;
+    vector<string> res( vs.size() );
+
+    size_t count = 0;
     for( const string& s : vs )
+    {
         if( readable_length < 5 )
-            tmp.push_back( s.c_str() );
+           res[count++] = s.c_str();
         else    
         {
             string tmp2 = s.substr( 0, readable_length / 2 - 1 );
             tmp2 += "...";
             tmp2 += s.substr( s.size() - readable_length / 2 + 1, s.size()-1 );
-            tmp.push_back( tmp2.c_str() ); 
+            res[count++] = tmp2.c_str();
         }
-    return tmp;
+    }
+
+    return res;
 }
 
-
-vector<const char*> toCStringVec( const list<string>& vs, int readable_length = 0 )
+vector<string> toLimited( 
+    const list<string>& vs, 
+    int readable_length = 5 )
 {
-    std::vector<const char*> tmp;
+    vector<string> res( vs.size() );
+
+    size_t count = 0;
     for( const string& s : vs )
+    {
         if( readable_length < 5 )
-            tmp.push_back( s.c_str() );
+           res[count++] = s.c_str();
         else    
         {
             string tmp2 = s.substr( 0, readable_length / 2 - 1 );
             tmp2 += "...";
             tmp2 += s.substr( s.size() - readable_length / 2 + 1, s.size()-1 );
-            tmp.push_back( tmp2.c_str() ); 
+            res[count++] = tmp2.c_str();
         }
-    return tmp;
+    }
+
+    return res;
 }
+
+void toCStringVec( 
+    vector<const char*>& res, 
+    const vector<string>& vs )
+{
+    res.resize( vs.size() );
+    size_t count = 0;
+
+    for( const string& s : vs )
+        res[count++] = s.c_str();
+}
+
 
 bool fileIOWindow(
         string& file_path,
-        std::vector<string>& recently_used_files,
+        const std::vector<string>& recently_used_files,
         const string& button_text,
-        std::vector<std::string> file_filter,
+        const std::vector<std::string> file_filter,
         bool ensure_file_exists,
         ImVec2 size )
 {
     bool close_it = false;
 
-    vector<const char*> extension_cstrings = toCStringVec( file_filter );
+    vector<const char*> extension_cstrings; 
+    toCStringVec( extension_cstrings, file_filter );
     
     static string current_folder = "x";
     static char c_current_folder[ 2048 ];
@@ -427,7 +459,10 @@ bool fileIOWindow(
     }
     
     list<string> local_files = MiniPath::listFiles( current_mini_path.getPath(), string( extension_cstrings[file_type_selected] ) );
-    vector<const char*> file_list = toCStringVec( local_files );
+    vector<string> local_files_readable = toLimited( local_files, 0 );
+    vector<const char*> file_list;
+
+    toCStringVec( file_list, local_files_readable );
 
     if ( directory_browsing )
         size.y += std::min( size_t( 8 ), std::max( dir_list.size(), file_list.size() ) ) *  GetFontSize();
@@ -450,7 +485,9 @@ bool fileIOWindow(
     {
     	SameLine();
 
-        std::vector<const char*> recent = toCStringVec( recently_used_files, 27 );
+        std::vector<string> recent_readable = toLimited( recently_used_files, 27 );
+        std::vector<const char*> recent;
+        toCStringVec( recent, recent_readable );
 
         if( Button(" " CARET_DOWN " ") )
             ImGui::OpenPopup("RecentFiles");
@@ -470,7 +507,7 @@ bool fileIOWindow(
     }
     Text("           "); SameLine();
     vector<string> split_directories = current_mini_path.getPathTokens();
-    for( int i = 0; i < split_directories.size(); ++i )
+    for( size_t i = 0; i < split_directories.size(); ++i )
     {
         if( Button( split_directories[i].c_str() ) )
         {
@@ -480,7 +517,7 @@ bool fileIOWindow(
             string chosen_dir = "/";
 #endif
 
-            for( int j = 0; j <= i; ++j)
+            for( size_t j = 0; j <= i; ++j)
             {
                 chosen_dir += split_directories[j];
                 if( j != i )
@@ -497,11 +534,12 @@ bool fileIOWindow(
         directory_browsing = true;
 
 #if defined(WIN32)
-        vector<const char*> drive_list = toCStringVec( getWindowsDrives() );
+        vector<const char*> drive_list;
+        toCStringVec( drive_list, getWindowsDrives() );
 
         // select list item dependent on folder path
         if( drive_list[drive_selected][0] != c_current_folder[0]  )
-            for( int i = 0; i < drive_list.size(); ++i )
+            for( size_t i = 0; i < drive_list.size(); ++i )
                 if( c_current_folder[0] == drive_list[i][0] )
                     drive_selected = i;
 
@@ -529,7 +567,7 @@ bool fileIOWindow(
 #ifndef WIN32
                 current_folder += "/";
 #endif
-                for( int i = 0; i < split_directories.size() - 1; ++i )
+                for( size_t i = 0; i < split_directories.size() - 1; ++i )
                 {
                     current_folder += split_directories[i];
                     if( i < split_directories.size() - 2 )
